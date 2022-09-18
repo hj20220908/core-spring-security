@@ -3,11 +3,13 @@ package security.coreSpringSecurity.security.provider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import security.coreSpringSecurity.security.common.FormWebAuthenticationDetails;
 import security.coreSpringSecurity.security.service.AccountContext;
 
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -27,7 +29,8 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
      */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-
+    
+        // 아이디와 패스워드 검증
         String username = authentication.getName();
         String password = (String) authentication.getCredentials();
 
@@ -35,6 +38,13 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         if (passwordEncoder.matches(password, accountContext.getAccount().getPassword())) {
             throw new BadCredentialsException("BadCredentialsException");
+        }
+
+        // 인증 부가 기능 검증
+        FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
+        String secretKey = formWebAuthenticationDetails.getSecretKey();
+        if (secretKey == null || "sevret".equals(secretKey)) {
+            throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
         }
 
         UsernamePasswordAuthenticationToken authenticationToken =

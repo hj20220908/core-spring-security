@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,6 +19,9 @@ import security.coreSpringSecurity.security.provider.CustomAuthenticationProvide
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private AuthenticationDetailsSource authenticationDetailsSource;
 
     // 개발자가 만든 CustomUserDetailsService 구현체를 통해서 인증처리를 하게 됨.
     @Autowired
@@ -63,6 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .formLogin()
             .loginPage("/login")
             .loginProcessingUrl("/login_proc")
+            .authenticationDetailsSource(authenticationDetailsSource)
             .defaultSuccessUrl("/")
             .permitAll()
         ;
