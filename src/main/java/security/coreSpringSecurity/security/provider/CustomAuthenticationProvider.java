@@ -43,7 +43,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         // 인증 부가 기능 검증
         FormWebAuthenticationDetails formWebAuthenticationDetails = (FormWebAuthenticationDetails) authentication.getDetails();
         String secretKey = formWebAuthenticationDetails.getSecretKey();
-        if (secretKey == null || "sevret".equals(secretKey)) {
+        if (secretKey == null || !"secret".equals(secretKey)) {
             throw new InsufficientAuthenticationException("InsufficientAuthenticationException");
         }
 
@@ -54,7 +54,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     }
 
     /**
-     * authentication 타입과 CustomAuthenticationProvider 토큰이 일치할 때
+     * authentication 타입과 CustomAuthenticationProvider 타입의 토큰이 일치할 때
      * CustomAuthenticationProvider 인증을 처리하도록 함
      * @param authentication
      * @return

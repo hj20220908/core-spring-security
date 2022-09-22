@@ -14,8 +14,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import security.coreSpringSecurity.security.provider.CustomAuthenticationProvider;
 
 @Configuration
@@ -23,7 +23,10 @@ import security.coreSpringSecurity.security.provider.CustomAuthenticationProvide
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private AuthenticationSuccessHandler authenticationSuccessHandler;
+    private AuthenticationSuccessHandler authenticationSuccessHandler;  // 인증 성공 시 핸들러
+
+    @Autowired
+    private AuthenticationFailureHandler authenticationFailureHandler;  // 인증 실패 시 핸들러
 
     @Autowired
     private AuthenticationDetailsSource authenticationDetailsSource;
@@ -63,7 +66,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http
             .authorizeRequests()
-            .antMatchers("/","/users","user/login/**").permitAll()
+            .antMatchers("/","/users","user/login/**","/login*").permitAll()
             .antMatchers("/mypage").hasRole("USER")
             .antMatchers("/messages").hasRole("MANAGER")
             .antMatchers("/config").hasRole("ADMIN")
@@ -75,6 +78,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authenticationDetailsSource(authenticationDetailsSource)
             .defaultSuccessUrl("/")
             .successHandler(authenticationSuccessHandler)
+            .failureHandler(authenticationFailureHandler)
             .permitAll()
         ;
     }
