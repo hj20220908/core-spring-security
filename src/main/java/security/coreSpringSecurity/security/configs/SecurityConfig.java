@@ -14,8 +14,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import security.coreSpringSecurity.security.common.FormAuthenticationDetailsSource;
+import security.coreSpringSecurity.security.handler.CustomAccessDeniedHandler;
 import security.coreSpringSecurity.security.provider.CustomAuthenticationProvider;
 
 @Configuration
@@ -29,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationFailureHandler authenticationFailureHandler;  // 인증 실패 시 핸들러
 
     @Autowired
-    private AuthenticationDetailsSource authenticationDetailsSource;
+    private FormAuthenticationDetailsSource authenticationDetailsSource;
 
     // 개발자가 만든 CustomUserDetailsService 구현체를 통해서 인증처리를 하게 됨.
     @Autowired
@@ -65,21 +68,32 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http
-            .authorizeRequests()
-            .antMatchers("/","/users","user/login/**","/login*").permitAll()
-            .antMatchers("/mypage").hasRole("USER")
-            .antMatchers("/messages").hasRole("MANAGER")
-            .antMatchers("/config").hasRole("ADMIN")
-            .anyRequest().authenticated()
+                .authorizeRequests()
+                .antMatchers("/","/users","user/login/**","/login*").permitAll()
+                .antMatchers("/mypage").hasRole("USER")
+                .antMatchers("/messages").hasRole("MANAGER")
+                .antMatchers("/config").hasRole("ADMIN")
+                .anyRequest().authenticated()
         .and()
-            .formLogin()
-            .loginPage("/login")
-            .loginProcessingUrl("/login_proc")
-            .authenticationDetailsSource(authenticationDetailsSource)
-            .defaultSuccessUrl("/")
-            .successHandler(authenticationSuccessHandler)
-            .failureHandler(authenticationFailureHandler)
-            .permitAll()
+                .formLogin()
+                .loginPage("/login")
+                .loginProcessingUrl("/login_proc")
+                .authenticationDetailsSource(authenticationDetailsSource)
+                .defaultSuccessUrl("/")
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
+                .permitAll()
+        .and()
+                .exceptionHandling()
+                .accessDeniedHandler(accessDeniedHandler())
         ;
     }
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
+        accessDeniedHandler.setErrorPage("/denied");
+        return accessDeniedHandler;
+    }
+
 }

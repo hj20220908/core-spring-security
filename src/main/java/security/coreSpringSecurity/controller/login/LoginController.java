@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import security.coreSpringSecurity.domain.Account;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +24,7 @@ public class LoginController {
         model.addAttribute("error", error);
         model.addAttribute("exception", exception);
 
-        return "user/login/login";
+        return "login";
     }
 
     @GetMapping("/logout")
@@ -38,6 +39,26 @@ public class LoginController {
 
         return "redirect:/login";
     }
+
+    /**
+     * denied 페이지에는 현재 사용자 이름과 자원에 접근하지 못하는 예외 메시지를 보여줌
+     * @param exception
+     * @param model
+     * @return
+     */
+    @GetMapping("/denied")
+    public String AccessDenied(@RequestParam(value = "exception", required = false) String exception,
+                               Model model) {
+        // 사용자 정보 호출
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Account account = (Account) authentication.getPrincipal();
+        model.addAttribute("username", account.getUsername());
+        model.addAttribute("exception", exception);
+
+
+        return "user/login/denied";
+    }
+
 }
 
 
