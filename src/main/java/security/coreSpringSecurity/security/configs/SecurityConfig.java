@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,7 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import security.coreSpringSecurity.security.common.FormAuthenticationDetailsSource;
+import security.coreSpringSecurity.security.filter.AjaxLoginProcessingFilter;
 import security.coreSpringSecurity.security.handler.CustomAccessDeniedHandler;
 import security.coreSpringSecurity.security.provider.CustomAuthenticationProvider;
 
@@ -26,13 +30,13 @@ import security.coreSpringSecurity.security.provider.CustomAuthenticationProvide
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private AuthenticationSuccessHandler authenticationSuccessHandler;  // 인증 성공 시 핸들러
+    private AuthenticationSuccessHandler formAuthenticationSuccessHandler;  // 인증 성공 시 핸들러
 
     @Autowired
-    private AuthenticationFailureHandler authenticationFailureHandler;  // 인증 실패 시 핸들러
+    private AuthenticationFailureHandler formAuthenticationFailureHandler;  // 인증 실패 시 핸들러
 
     @Autowired
-    private FormAuthenticationDetailsSource authenticationDetailsSource;
+    private FormAuthenticationDetailsSource formAuthenticationDetailsSource;
 
     // 개발자가 만든 CustomUserDetailsService 구현체를 통해서 인증처리를 하게 됨.
     @Autowired
@@ -65,6 +69,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http
@@ -74,19 +83,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/messages").hasRole("MANAGER")
                 .antMatchers("/config").hasRole("ADMIN")
                 .anyRequest().authenticated()
-        .and()
+                .and()
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/login_proc")
-                .authenticationDetailsSource(authenticationDetailsSource)
+                .authenticationDetailsSource(formAuthenticationDetailsSource)
                 .defaultSuccessUrl("/")
-                .successHandler(authenticationSuccessHandler)
-                .failureHandler(authenticationFailureHandler)
+                .successHandler(formAuthenticationSuccessHandler)
+                .failureHandler(formAuthenticationFailureHandler)
                 .permitAll()
         .and()
                 .exceptionHandling()
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+                .accessDeniedPage("/denied")
                 .accessDeniedHandler(accessDeniedHandler())
+        .and()
+                .addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
+
+        http.csrf().disable();
     }
 
     @Bean
@@ -96,4 +111,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return accessDeniedHandler;
     }
 
+    @Bean
+    public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
+        AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
+        ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManagerBean());
+        return ajaxLoginProcessingFilter;
+    }
 }
