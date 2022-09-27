@@ -19,12 +19,7 @@ public class AjaxAuthenticationFailureHandler implements AuthenticationFailureHa
     private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * 인증 실패 시 예외 타이벵 따라 메시지를 전송함.
-     * @param request
-     * @param response
-     * @param exception
-     * @throws IOException
-     * @throws ServletException
+     * 인증 실패 시 예외 타입에 따라 메시지를 전송함.
      */
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response,

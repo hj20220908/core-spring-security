@@ -34,10 +34,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private FormAuthenticationDetailsSource formAuthenticationDetailsSource;
 
     @Autowired
-    private AuthenticationSuccessHandler formAuthenticationSuccessHandler;  // 인증 성공 시 핸들러
+    private AuthenticationSuccessHandler customAuthenticationSuccessHandler;  // 인증 성공 시 핸들러
 
     @Autowired
-    private AuthenticationFailureHandler formAuthenticationFailureHandler;  // 인증 실패 시 핸들러
+    private AuthenticationFailureHandler customAuthenticationFailureHandler;  // 인증 실패 시 핸들러
 
     // 개발자가 만든 CustomUserDetailsService 구현체를 통해서 인증처리를 하게 됨.
     @Autowired
@@ -90,8 +90,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/login_proc")
                 .authenticationDetailsSource(formAuthenticationDetailsSource)
                 .defaultSuccessUrl("/")
-                .successHandler(formAuthenticationSuccessHandler)
-                .failureHandler(formAuthenticationFailureHandler)
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customAuthenticationFailureHandler)
                 .permitAll()
         .and()
                 .exceptionHandling()
