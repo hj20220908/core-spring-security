@@ -67,10 +67,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(final HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/mypage").hasRole("USER")
-                .antMatchers("/messages").hasRole("MANAGER")
-                .antMatchers("/config").hasRole("ADMIN")
-                .antMatchers("/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -86,8 +82,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
                 .accessDeniedPage("/denied")
                 .accessDeniedHandler(accessDeniedHandler())
-//        .and()
-//                .addFilterBefore(customFilterSecurityInterceptor(), FilterSecurityInterceptor.class)
+        .and()
+                .addFilterBefore(customFilterSecurityInterceptor(), FilterSecurityInterceptor.class)
         ;
 
         http.csrf().disable();
@@ -135,12 +131,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return commonAccessDeniedHandler;
     }
 
+    /**
+     * 사용자가 접근하고자 하는 Url 자원에 대한 권한 정보 추출해서 반환하는 필터
+     */
     @Bean
     public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
-
         FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        // 구현 클래스 추가
         filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
+        // 접근 결정 관리자 추가 (AffirmativeBased, ConsensusBased, UnanimousBased)
         filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
+        // 인증 관리자 추가 (인증된 사용자인지 검사)
         filterSecurityInterceptor.setAuthenticationManager(authenticationManagerBean());
         return filterSecurityInterceptor;
     }
