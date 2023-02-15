@@ -7,13 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import security.coreSpringSecurity.domain.Account;
+import security.coreSpringSecurity.domain.entity.Account;
 import security.coreSpringSecurity.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Service("userDetailsService")
+@Service("customUserDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired

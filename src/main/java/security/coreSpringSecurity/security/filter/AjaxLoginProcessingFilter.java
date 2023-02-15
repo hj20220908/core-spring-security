@@ -8,11 +8,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StringUtils;
-import security.coreSpringSecurity.domain.AccountDto;
+import security.coreSpringSecurity.domain.dto.AccountDto;
 import security.coreSpringSecurity.security.token.AjaxAuthenticationToken;
 import security.coreSpringSecurity.util.WebUtil;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,7 +22,7 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
     private static final String X_REQUESTED_WITH = "X-Requested-With";
 
     private ObjectMapper objectMapper = new ObjectMapper();
-
+    
     public AjaxLoginProcessingFilter() {
         super(new AntPathRequestMatcher("/ajaxLogin", "POST"));
     }

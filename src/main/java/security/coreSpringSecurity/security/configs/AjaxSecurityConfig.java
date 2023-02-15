@@ -7,12 +7,12 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import security.coreSpringSecurity.security.common.AjaxLoginAuthenticationEntryPoint;
-import security.coreSpringSecurity.security.filter.AjaxLoginProcessingFilter;
 import security.coreSpringSecurity.security.handler.AjaxAccessDeniedHandler;
 import security.coreSpringSecurity.security.handler.AjaxAuthenticationFailureHandler;
 import security.coreSpringSecurity.security.handler.AjaxAuthenticationSuccessHandler;
@@ -27,10 +27,14 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(ajaxAuthenticationProvider());
     }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
 
     @Bean
     public AuthenticationProvider ajaxAuthenticationProvider() {
-        return new AjaxAuthenticationProvider();
+        return new AjaxAuthenticationProvider(passwordEncoder());
     }
 
     @Bean
