@@ -12,7 +12,18 @@ public class AjaxLoginAuthenticationEntryPoint implements AuthenticationEntryPoi
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UnAuthorized");
+//        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "UnAuthorized");
+        String body = "UnAuthorized";
+        sendErrorWithBody(response, HttpServletResponse.SC_UNAUTHORIZED, body);
+    }
+
+    private void sendErrorWithBody(HttpServletResponse response, int statusCode, String body) throws IOException {
+        response.setStatus(statusCode);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(body);
+        response.getWriter().flush();
+        response.getWriter().close();
     }
 
 }
