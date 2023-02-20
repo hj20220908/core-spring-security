@@ -14,6 +14,12 @@ public class UrlFilterInvocationSecurityMetadatsSource implements FilterInvocati
 
     private LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap = new LinkedHashMap<>();
 
+    public UrlFilterInvocationSecurityMetadatsSource(LinkedHashMap<RequestMatcher, List<ConfigAttribute>> resourceMap) {
+
+        this.requestMap = resourceMap;
+
+    }
+
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
 
@@ -21,7 +27,7 @@ public class UrlFilterInvocationSecurityMetadatsSource implements FilterInvocati
         HttpServletRequest request = ((FilterInvocation) object).getRequest();
 
         // 자원에 대한 권한 정보 설정
-        requestMap.put(new AntPathRequestMatcher("/mypage"), Arrays.asList(new SecurityConfig("ROLE_USER")));
+//        requestMap.put(new AntPathRequestMatcher("/mypage"), Arrays.asList(new SecurityConfig("ROLE_USER")));
 
         // 자원에 설정된 권한 정보 조회
         if (requestMap != null) {

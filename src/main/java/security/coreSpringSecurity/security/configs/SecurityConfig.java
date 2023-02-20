@@ -25,15 +25,18 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import security.coreSpringSecurity.security.common.FormWebAuthenticationDetailsSource;
+import security.coreSpringSecurity.security.factory.UrlResourcesMapFactoryBean;
 import security.coreSpringSecurity.security.handler.AjaxAuthenticationFailureHandler;
 import security.coreSpringSecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import security.coreSpringSecurity.security.handler.FormAccessDeniedHandler;
 import security.coreSpringSecurity.security.metadatasource.UrlFilterInvocationSecurityMetadatsSource;
 import security.coreSpringSecurity.security.provider.AjaxAuthenticationProvider;
 import security.coreSpringSecurity.security.provider.FormAuthenticationProvider;
+import security.coreSpringSecurity.service.SecurityResourceService;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ResourceBundle;
 
 @Configuration
 @EnableWebSecurity
@@ -46,6 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationSuccessHandler formAuthenticationSuccessHandler;
     @Autowired
     private AuthenticationFailureHandler formAuthenticationFailureHandler;
+
+    @Autowired
+    private SecurityResourceService securityResourceService;
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -156,8 +162,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() {
-        return new UrlFilterInvocationSecurityMetadatsSource();
+    public FilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() throws Exception {
+        return new UrlFilterInvocationSecurityMetadatsSource(urlResourcesMapFactoryBean().getObject());
+    }
+
+    private UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {
+
+        UrlResourcesMapFactoryBean urlResourcesMapFactoryBean = new UrlResourcesMapFactoryBean();
+        urlResourcesMapFactoryBean.setSecurityResourceService(securityResourceService);
+
+        return urlResourcesMapFactoryBean;
     }
 
 
