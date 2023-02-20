@@ -26,6 +26,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import security.coreSpringSecurity.security.common.FormWebAuthenticationDetailsSource;
 import security.coreSpringSecurity.security.factory.UrlResourcesMapFactoryBean;
+import security.coreSpringSecurity.security.filter.PermitAllFilter;
 import security.coreSpringSecurity.security.handler.AjaxAuthenticationFailureHandler;
 import security.coreSpringSecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import security.coreSpringSecurity.security.handler.FormAccessDeniedHandler;
@@ -49,9 +50,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private AuthenticationSuccessHandler formAuthenticationSuccessHandler;
     @Autowired
     private AuthenticationFailureHandler formAuthenticationFailureHandler;
-
     @Autowired
     private SecurityResourceService securityResourceService;
+
+    private String[] permitAllResources = {"/", "/login", "/user/login/**"};
 
     @Override
     public void configure(WebSecurity web) throws Exception {
@@ -141,15 +143,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * 사용자가 접근하고자 하는 Url 자원에 대한 권한 정보 추출해서 반환하는 필터
      */
     @Bean
-    public FilterSecurityInterceptor customFilterSecurityInterceptor() throws Exception {
-        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+    public PermitAllFilter customFilterSecurityInterceptor() throws Exception {
+        PermitAllFilter permitAllFilter = new PermitAllFilter(permitAllResources);
         // 구현 클래스 추가
-        filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
+        permitAllFilter.setSecurityMetadataSource(urlFilterInvocationSecurityMetadataSource());
         // 접근 결정 관리자 추가 (AffirmativeBased, ConsensusBased, UnanimousBased)
-        filterSecurityInterceptor.setAccessDecisionManager(affirmativeBased());
+        permitAllFilter.setAccessDecisionManager(affirmativeBased());
         // 인증 관리자 추가 (인증된 사용자인지 검사)
-        filterSecurityInterceptor.setAuthenticationManager(authenticationManagerBean());
-        return filterSecurityInterceptor;
+        permitAllFilter.setAuthenticationManager(authenticationManagerBean());
+        return permitAllFilter;
     }
 
     private AccessDecisionManager affirmativeBased() {
