@@ -12,6 +12,7 @@ import security.coreSpringSecurity.domain.dto.ResourcesDto;
 import security.coreSpringSecurity.domain.entity.Resources;
 import security.coreSpringSecurity.domain.entity.Role;
 import security.coreSpringSecurity.repository.RoleRepository;
+import security.coreSpringSecurity.security.metadatasource.UrlFilterInvocationSecurityMetadatsSource;
 import security.coreSpringSecurity.service.ResourcesService;
 import security.coreSpringSecurity.service.RoleService;
 
@@ -30,6 +31,9 @@ public class ResourcesController {
 
 	@Autowired
 	private RoleService roleService;
+
+	@Autowired
+	private UrlFilterInvocationSecurityMetadatsSource filterInvocationSecurityMetadatsSource;
 
 	@GetMapping(value="/admin/resources")
 	public String getResources(Model model) throws Exception {
@@ -51,6 +55,7 @@ public class ResourcesController {
 		resources.setRoleSet(roles);
 
 		resourcesService.createResources(resources);
+		filterInvocationSecurityMetadatsSource.reload();
 
 		return "redirect:/admin/resources";
 	}
@@ -89,6 +94,7 @@ public class ResourcesController {
 
 		Resources resources = resourcesService.getResources(Long.valueOf(id));
 		resourcesService.deleteResources(Long.valueOf(id));
+		filterInvocationSecurityMetadatsSource.reload();
 
 		return "redirect:/admin/resources";
 	}

@@ -1,23 +1,23 @@
 package security.coreSpringSecurity.security.metadatasource;
 
 import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import security.coreSpringSecurity.service.SecurityResourceService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 public class UrlFilterInvocationSecurityMetadatsSource implements FilterInvocationSecurityMetadataSource {
 
-    private LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap = new LinkedHashMap<>();
+    private LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap;
 
-    public UrlFilterInvocationSecurityMetadatsSource(LinkedHashMap<RequestMatcher, List<ConfigAttribute>> resourceMap) {
+    private SecurityResourceService securityResourceService;
 
+    public UrlFilterInvocationSecurityMetadatsSource(LinkedHashMap<RequestMatcher, List<ConfigAttribute>> resourceMap, SecurityResourceService securityResourceService) {
         this.requestMap = resourceMap;
-
+        this.securityResourceService = securityResourceService;
     }
 
     @Override
@@ -60,4 +60,17 @@ public class UrlFilterInvocationSecurityMetadatsSource implements FilterInvocati
     public boolean supports(Class<?> clazz) {
         return FilterInvocation.class.isAssignableFrom(clazz);
     }
+
+    public void reload() {
+        LinkedHashMap<RequestMatcher, List<ConfigAttribute>> reloadedMap = securityResourceService.getResourceList();
+        Iterator<Map.Entry<RequestMatcher, List<ConfigAttribute>>> iterator = reloadedMap.entrySet().iterator();
+
+        requestMap.clear();
+
+        while (iterator.hasNext()) {
+            Map.Entry<RequestMatcher, List<ConfigAttribute>> entry = iterator.next();
+            requestMap.put(entry.getKey(), entry.getValue());
+        }
+    }
+
 }
