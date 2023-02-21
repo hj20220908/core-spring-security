@@ -57,12 +57,17 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     private void setupSecurityResources() {
         Set<Role> roles = new HashSet<>();
+        // 사용자 정보
         Role adminRole = createRoleIfNotFound("ROLE_ADMIN", "관리자");
         roles.add(adminRole);
+
+        // 권한 정보
         createResourceIfNotFound("/admin/**", "", roles, "url");
         createUserIfNotFound("admin@gmail.com", "admin@admin.com", "pass", roles);
         Role managerRole = createRoleIfNotFound("ROLE_MANAGER", "매니저권한");
         Role userRole = createRoleIfNotFound("ROLE_USER", "사용자권한");
+
+        // 자원 정보
         createRoleHierarchyIfNotFound(managerRole, adminRole);
         createRoleHierarchyIfNotFound(userRole, managerRole);
 
@@ -137,6 +142,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         childRoleHierarchy.setParentName(parentRoleHierarchy);
     }
 
+    /**
+     * 아이피 정보 설정
+     */
     private void setupAccessIpData() {
         AccessIp byIpAddress = accessIpRepository.findByIpAddress("127.0.0.1");
         if (byIpAddress == null) {

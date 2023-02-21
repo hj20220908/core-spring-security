@@ -7,11 +7,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDecisionManager;
 import org.springframework.security.access.AccessDecisionVoter;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleHierarchyVoter;
-import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -36,12 +34,11 @@ import security.coreSpringSecurity.security.handler.FormAccessDeniedHandler;
 import security.coreSpringSecurity.security.metadatasource.UrlFilterInvocationSecurityMetadatsSource;
 import security.coreSpringSecurity.security.provider.AjaxAuthenticationProvider;
 import security.coreSpringSecurity.security.provider.FormAuthenticationProvider;
+import security.coreSpringSecurity.security.voter.IpAddressVoter;
 import security.coreSpringSecurity.service.SecurityResourceService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.ResourceBundle;
 
 @Configuration
 @EnableWebSecurity
@@ -158,6 +155,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return permitAllFilter;
     }
 
+    /**
+     * 접근 결정 관리자
+     * @return
+     */
     private AccessDecisionManager affirmativeBased() {
         AffirmativeBased affirmativeBased = new AffirmativeBased(getAccessDecistionVoters());
         return affirmativeBased;
@@ -165,7 +166,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private List<AccessDecisionVoter<?>> getAccessDecistionVoters() {
 
+        // 순서 중요!
         List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
+        accessDecisionVoters.add(new IpAddressVoter(securityResourceService));
         accessDecisionVoters.add(roleVoter());
 
         return accessDecisionVoters;
