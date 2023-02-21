@@ -31,20 +31,16 @@ public class IpAddressVoter implements AccessDecisionVoter<Object> {
     @Override
     public int vote(Authentication authentication, Object object, Collection<ConfigAttribute> configList) {
 
-        if (!(authentication.getDetails() instanceof WebAuthenticationDetails)) {
-            return ACCESS_DENIED;
-        }
-
         WebAuthenticationDetails details = (WebAuthenticationDetails) authentication.getDetails();
         String address = details.getRemoteAddress();
+
         List<String> accessIpList = securityResourceService.getAccessIpList();
 
         int result = ACCESS_DENIED;
 
         for (String ipAddress : accessIpList) {
-
             if (address.equals(ipAddress)) {
-                return ACCESS_GRANTED;
+                return ACCESS_ABSTAIN;
             }
         }
 
